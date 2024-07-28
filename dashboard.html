@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Management Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        header {
+            background-color: #6E260E;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        header h1 {
+            margin: 0;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #A0522D;
+            padding: 10px;
+        }
+        nav a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            background-color: #6E260E;
+            border-radius: 5px;
+        }
+        .container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .section {
+            width: 80%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            border-bottom: 2px solid #6E260E;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .card {
+            background-color: #f5deb3;
+            border: 1px solid #6E260E;
+            border-radius: 8px;
+            padding: 20px;
+            width: 250px;
+            margin: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .card h3 {
+            margin-top: 0;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chart {
+            width: 100%;
+            max-width: 600px;
+            height: 200px; /* Reduced height */
+            margin: 20px;
+        }
+        footer {
+            background-color: #6E260E;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .logout a {
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #8B0000;
+            border-radius: 5px;
+        }
+        .logout a:hover {
+            background-color: #A52A2A;
+        }
+        .filter-sort {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .filter-sort select, .filter-sort input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .filter-sort button {
+            padding: 10px;
+            background-color: #A0522D;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .filter-sort button:hover {
+            background-color: #6E260E;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Asset Management Dashboard</h1>
+        <div class="logout">
+            <a href="login.html">Logout</a>
+        </div>
+    </header>
+    <nav>
+        <a href="#overview">Overview</a>
+        <a href="#assets">Assets</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#reports">Reports</a>
+    </nav>
+    <div class="container">
+        <section id="overview" class="section">
+            <h2>Overview</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Total Assets</h3>
+                    <p id="total-assets">18500</p>
+                </div>
+                <div class="card">
+                    <h3>Active Assets</h3>
+                    <p id="active-assets">1000</p>
+                </div>
+                <div class="card">
+                    <h3>Maintenance Due</h3>
+                    <p id="maintenance-due">450</p>
+                </div>
+                <div class="card">
+                    <h3>Recent Issues</h3>
+                    <p id="recent-issues">50</p>
+                </div>
+            </div>
+        </section>
+        <section id="assets" class="section">
+            <h2>Asset Details</h2>
+            <div class="filter-sort">
+                <input type="text" id="filter-input" placeholder="Search by name">
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <option value="Equipment">Equipment</option>
+                    <option value="Vehicle">Vehicle</option>
+                    <option value="Infrastructure">Infrastructure</option>
+                    <option value="Public Property">Public Property</option>
+                </select>
+                <button onclick="applyFilters()">Apply Filters</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Value</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody id="asset-table-body">
+                    <!-- Asset rows will be added here dynamically -->
+                </tbody>
+            </table>
+            <p><a href="as.html">View Full Dataset</a></p>
+        </section>
+        <section id="analytics" class="section">
+            <h2>Analytics</h2>
+            <div class="chart-container">
+                <canvas id="bar-chart" class="chart"></canvas>
+                <canvas id="scatter-chart" class="chart"></canvas>
+                <canvas id="pie-chart" class="chart"></canvas>
+            </div>
+        </section>
+        <section id="reports" class="section">
+            <h2>Reports</h2>
+            <p>Generate and view detailed reports here.</p>
+            <button onclick="generateReport()">Generate Report</button>
+        </section>
+    </div>
+    <footer>
+        <p>&copy; 2024 Asset Management System. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const assetData = {
+            Equipment: [
+                { id: 'E001', name: 'Excavator', value: 1500, location: 'Bhawarkua' },
+                { id: 'E002', name: 'Bulldozer', value: 2000, location: 'Vijay Nagar' },
+                { id: 'E003', name: 'Crane', value: 2500, location: 'Palasia' },
+                { id: 'E004', name: 'Dump Truck', value: 3000, location: 'Rau' },
+                { id: 'E005', name: 'Loader', value: 1800, location: 'Pardesipura' }
+            ],
+            Vehicle: [
+                { id: 'V001', name: 'Fire Truck', value: 8000, location: 'Rajwada' },
+                { id: 'V002', name: 'Police Car', value: 2000, location: 'Chappan Dukan' },
+                { id: 'V003', name: 'Ambulance', value: 2500, location: 'Mhow' },
+                { id: 'V004', name: 'Bus', value: 3500, location: 'Rau' },
+                { id: 'V005', name: 'Garbage Truck', value: 4000, location: 'Musakhedi' }
+            ],
+            Infrastructure: [
+                { id: 'I001', name: 'School Building', value: 50000, location: 'Bhawarkua' },
+                { id: 'I002', name: 'Hospital', value: 60000, location: 'Vijay Nagar' },
+                { id: 'I003', name: 'Library', value: 20000, location: 'Palasia' },
+                { id: 'I004', name: 'Park', value: 15000, location: 'Rau' },
+                { id: 'I005', name: 'Community Center', value: 30000, location: 'Pardesipura' }
+            ],
+            'Public Property': [
+                { id: 'P001', name: 'Public Bench', value: 150, location: 'Rajwada' },
+                { id: 'P002', name: 'Trash Bin', value: 100, location: 'Chappan Dukan' },
+                { id: 'P003', name: 'Street Sign', value: 200, location: 'Mhow' },
+                { id: 'P004', name: 'Bus Shelter', value: 800, location: 'Rau' },
+                { id: 'P005', name: 'Playground Equipment', value: 1200, location: 'Musakhedi' }
+            ]
+        };
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('filter-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+
+            const filteredData = Object.keys(assetData).reduce((acc, cat) => {
+                acc[cat] = assetData[cat].filter(asset => {
+                    const matchesName = asset.name.toLowerCase().includes(searchTerm);
+                    const matchesCategory = !category || cat === category;
+                    return matchesName && matchesCategory;
+                });
+                return acc;
+            }, {});
+
+            updateAssetTable(filteredData);
+        }
+
+        function updateAssetTable(filteredData) {
+            const tableBody = document.getElementById('asset-table-body');
+            tableBody.innerHTML = ''; // Clear previous results
+
+            Object.keys(filteredData).forEach(category => {
+                filteredData[category].forEach(asset => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.id}</td>
+                        <td>${asset.name}</td>
+                        <td>${category}</td>
+                        <td>${asset.value}</td>
+                        <td>${asset.location}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            });
+        }
+
+        function generateReport() {
+            alert('Report generation is not implemented yet.');
+        }
+
+        function simulateRealTimeUpdates() {
+            let previousIssues = 0;
+
+            setInterval(() => {
+                updateDashboard(previousIssues);
+            }, 5000); // Update every 5 seconds
+        }
+
+        function updateDashboard(previousIssues) {
+            const { totalAssets, activeAssets, maintenanceDue, recentIssues } = generateDashboardData();
+
+            document.getElementById('total-assets').textContent = totalAssets;
+            document.getElementById('active-assets').textContent = activeAssets;
+            document.getElementById('maintenance-due').textContent = maintenanceDue;
+            document.getElementById('recent-issues').textContent = recentIssues;
+
+            updateCharts(totalAssets, activeAssets, maintenanceDue, recentIssues);
+        }
+
+        function generateRandomValue(max) {
+            return Math.floor(Math.random() * (max / 100)) * 100;
+        }
+
+        function generateDashboardData() {
+            const totalAssets = 20000; // Increased total assets for a larger dataset
+            const activeAssets = generateRandomValue(totalAssets - 100);
+            const maintenanceDue = generateRandomValue(totalAssets - activeAssets);
+            const recentIssues = generateRandomValue(maintenanceDue);
+
+            return {
+                totalAssets,
+                activeAssets,
+                maintenanceDue,
+                recentIssues
+            };
+        }
+
+        function updateCharts(totalAssets, activeAssets, maintenanceDue, recentIssues) {
+            const ctxBar = document.getElementById('bar-chart').getContext('2d');
+            const ctxScatter = document.getElementById('scatter-chart').getContext('2d');
+            const ctxPie = document.getElementById('pie-chart').getContext('2d');
+
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Assets', 'Active Assets', 'Maintenance Due', 'Recent Issues'],
+                    datasets: [{
+                        label: 'Asset Statistics',
+                        data: [totalAssets, activeAssets, maintenanceDue, recentIssues],
+                        backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#f44336'],
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            new Chart(ctxScatter, {
+                type: 'scatter',
+                data: {
+                    datasets: Object.keys(assetData).map((category, index) => ({
+                        label: category,
+                        data: assetData[category].map(asset => ({
+                            x: index + 1, // Different x-value for each category
+                            y: asset.value
+                        })),
+                        backgroundColor: getColor(index),
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom',
+                            ticks: {
+                                stepSize: 1,
+                                callback: (value) => {
+                                    return Object.keys(assetData)[value - 1] || '';
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: ['Active Assets', 'Maintenance Due', 'Recent Issues'],
+                    datasets: [{
+                        label: 'Asset Status',
+                        data: [activeAssets, maintenanceDue, recentIssues],
+                        backgroundColor: ['#4caf50', '#ff9800', '#f44336'],
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+        }
+
+        function getColor(index) {
+            const colors = ['#4caf50', '#2196f3', '#ff9800', '#f44336'];
+            return colors[index % colors.length];
+        }
+
+        // Initialize dashboard
+        simulateRealTimeUpdates();
+    </script>
+</body>
+</html>
